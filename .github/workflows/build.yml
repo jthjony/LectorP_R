@@ -3,7 +3,7 @@ name: Build APK
 on:
   push:
     branches:
-      - main  # se ejecuta al hacer push a main
+      - main
 
 jobs:
   build:
@@ -18,12 +18,20 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y zip unzip openjdk-17-jdk python3-pip
           pip install --upgrade pip
           pip install buildozer cython
+
+      # 👇 PASO NUEVO: Instalar SDK de Android
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      # 👇 PASO NUEVO: Aceptar licencias automáticamente
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
 
       - name: Build APK
         run: |
@@ -34,5 +42,3 @@ jobs:
         with:
           name: mi_app.apk
           path: bin/*.apk
-
-
