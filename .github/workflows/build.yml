@@ -26,7 +26,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y zip unzip openjdk-17-jdk python3-pip \
             autoconf automake libtool pkg-config zlib1g-dev libffi-dev libssl-dev \
-            libncurses5 libstdc++6 git wget curl
+            libncurses-dev libstdc++6 git wget curl
           pip install --upgrade pip
           pip install buildozer cython
 
@@ -38,7 +38,7 @@ jobs:
           build-tools: 33.0.2
           accept-licenses: true
 
-      # 5️⃣ Asegurar instalación de platform-tools y build-tools
+      # 5️⃣ Instalar platform-tools y componentes faltantes
       - name: Install missing SDK components
         run: |
           yes | $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager \
