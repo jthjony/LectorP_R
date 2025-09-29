@@ -25,13 +25,27 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
 
-      # 👇 PASO NUEVO: Instalar SDK de Android
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # 👇 Instalar Android SDK y Build Tools
+      - name: Install Android SDK
+        run: |
+          mkdir -p $HOME/android-sdk
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip -d $HOME/android-sdk
+          mv $HOME/android-sdk/cmdline-tools $HOME/android-sdk/cmdline-tools-temp
+          mkdir -p $HOME/android-sdk/cmdline-tools/latest
+          mv $HOME/android-sdk/cmdline-tools-temp/* $HOME/android-sdk/cmdline-tools/latest
 
-      # 👇 PASO NUEVO: Aceptar licencias automáticamente
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses || true
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+          
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;36.1.0"
+
+      # 👇 Asegurar variables de entorno para Buildozer
+      - name: Set Android environment variables
+        run: |
+          echo "export ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "export PATH=\$ANDROID_SDK_ROOT/platform-tools:\$ANDROID_SDK_ROOT/build-tools/36.1.0:\$PATH" >> $GITHUB_ENV
 
       - name: Build APK
         run: |
