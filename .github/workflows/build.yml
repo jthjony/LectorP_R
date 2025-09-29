@@ -20,11 +20,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      # 3️⃣ Instalar dependencias del sistema y Python
+      # 3️⃣ Instalar dependencias del sistema
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y zip unzip openjdk-17-jdk python3-pip
+          sudo apt-get install -y zip unzip openjdk-17-jdk python3-pip \
+            autoconf automake libtool pkg-config zlib1g-dev libffi-dev libssl-dev \
+            libncurses5 libstdc++6 git wget curl
           pip install --upgrade pip
           pip install buildozer cython
 
@@ -33,21 +35,29 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           api-level: 33
-          build-tools: 36.1.0
+          build-tools: 33.0.2
           accept-licenses: true
 
-      # 5️⃣ Exportar variables de entorno necesarias para Buildozer
+      # 5️⃣ Asegurar instalación de platform-tools y build-tools
+      - name: Install missing SDK components
+        run: |
+          yes | $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" "build-tools;33.0.2" "platforms;android-33"
+
+      # 6️⃣ Exportar variables de entorno necesarias para Buildozer
       - name: Set Android environment variables
         run: |
-          echo "export ANDROID_SDK_ROOT=\$HOME/Android/Sdk" >> $GITHUB_ENV
-          echo "export PATH=\$ANDROID_SDK_ROOT/platform-tools:\$ANDROID_SDK_ROOT/build-tools/36.1.0:\$PATH" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/Android/Sdk" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$HOME/Android/Sdk" >> $GITHUB_ENV
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+          echo "PATH=$HOME/Android/Sdk/platform-tools:$HOME/Android/Sdk/build-tools/33.0.2:$PATH" >> $GITHUB_ENV
 
-      # 6️⃣ Compilar APK con Buildozer
+      # 7️⃣ Compilar APK con Buildozer
       - name: Build APK
         run: |
           buildozer android debug
 
-      # 7️⃣ Subir APK como artifact
+      # 8️⃣ Subir APK como artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
