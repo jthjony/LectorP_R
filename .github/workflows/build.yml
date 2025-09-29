@@ -42,7 +42,7 @@ jobs:
           echo "export ANDROID_SDK_ROOT=\$HOME/Android/Sdk" >> $GITHUB_ENV
           echo "export PATH=\$ANDROID_SDK_ROOT/platform-tools:\$ANDROID_SDK_ROOT/build-tools/36.1.0:\$PATH" >> $GITHUB_ENV
 
-      # 6️⃣ Compilar APK
+      # 6️⃣ Compilar APK con Buildozer
       - name: Build APK
         run: |
           buildozer android debug
