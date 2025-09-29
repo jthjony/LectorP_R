@@ -1,0 +1,9 @@
+genera un codigo en python donde se genere una apk para una tableta android que pueda hacer un https call a este link 
+api donde el valor (KNR) es el valor que varia en el link por cada consulta. El link es el siguiente: 
+http://assemblylive.sj.audi.vwg:9100/Carinformation/ALL/PRNumberbyFamily/(KNR)
+Después de eso se va a generar una lista de valores asi en el json.
+{"PR":["FAM":"MEM","PR":"AI1"},{"FAM":"LHZ","PR":"AI9"},{"FAM":"QUA","PR":"AQ0"},{"FAM":....
+
+Quiero comprar ese json resultante con una base de datos de piezas donde cada pieza tiene una combinacion especifica
+de codigos como los de arriba donde una pieza puede ser tal si contiene 1x1, 4P4, 3N0 entonces el programa puede enseñar
+fotografias almacenadas de estas piezas dependiendo de la configuracion que el json marca
