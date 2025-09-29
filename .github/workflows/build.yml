@@ -10,14 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Clonar el repositorio
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # 2️⃣ Configurar Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
+      # 3️⃣ Instalar dependencias del sistema y Python
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -25,32 +28,26 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
 
-      # 👇 Instalar Android SDK y Build Tools
-      - name: Install Android SDK
-        run: |
-          mkdir -p $HOME/android-sdk
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip -d $HOME/android-sdk
-          mv $HOME/android-sdk/cmdline-tools $HOME/android-sdk/cmdline-tools-temp
-          mkdir -p $HOME/android-sdk/cmdline-tools/latest
-          mv $HOME/android-sdk/cmdline-tools-temp/* $HOME/android-sdk/cmdline-tools/latest
+      # 4️⃣ Instalar SDK de Android con build-tools y aceptar licencias
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 33
+          build-tools: 36.1.0
+          accept-licenses: true
 
-          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
-          
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-33" "build-tools;36.1.0"
-
-      # 👇 Asegurar variables de entorno para Buildozer
+      # 5️⃣ Exportar variables de entorno necesarias para Buildozer
       - name: Set Android environment variables
         run: |
-          echo "export ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "export ANDROID_SDK_ROOT=\$HOME/Android/Sdk" >> $GITHUB_ENV
           echo "export PATH=\$ANDROID_SDK_ROOT/platform-tools:\$ANDROID_SDK_ROOT/build-tools/36.1.0:\$PATH" >> $GITHUB_ENV
 
+      # 6️⃣ Compilar APK
       - name: Build APK
         run: |
           buildozer android debug
 
+      # 7️⃣ Subir APK como artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
